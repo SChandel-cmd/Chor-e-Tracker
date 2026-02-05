@@ -266,7 +266,12 @@ export const GoogleAuthProvider: React.FC<{ children: ReactNode }> = ({
 
   const signInWithGoogleRedirect = useCallback(async () => {
     const supabase = createClient();
-    const redirectTo = typeof window !== "undefined" ? `${window.location.origin}/auth/callback` : "/auth/callback";
+    // Use NEXT_PUBLIC_APP_URL in production so Supabase redirects to your real domain (not localhost)
+    const baseUrl =
+      typeof window !== "undefined"
+        ? process.env.NEXT_PUBLIC_APP_URL || window.location.origin
+        : process.env.NEXT_PUBLIC_APP_URL || "";
+    const redirectTo = baseUrl ? `${baseUrl.replace(/\/$/, "")}/auth/callback` : "/auth/callback";
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo },
